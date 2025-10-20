@@ -14,10 +14,10 @@ namespace VirusSimulator_Roman
                                     { '-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-' },
                                     { '-','-','-','-','-','-','-','-','-','-','-','-','-','~','~','~','~','-','-','-','-','-','-','-','-','-','-','-','-','-','-' },
                                     { '^','^','^','^','^','^','-','-','-','-','-','-','~','~','~','~','~','~','~','~','~','-','-','-','-','-','-','-','-','-','-' },
-                                    { '^','^','^','^','^','^','^','^','^','-','-','~','~','~','~','~','~','~','~','~','~','-','-','-','-','-','-','-','-','-','-' },
-                                    { '^','^','^','-','-','-','-','-','-','~','~','~','~','~','~','~','~','~','~','~','-','-','-','-','-','^','^','^','^','^','^' },
-                                    { '-','-','-','-','-','-','-','-','-','-','~','~','~','~','~','~','~','~','~','-','-','-','-','^','^','^','^','^','^','^','^' },
-                                    { '-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','~','~','~','~','-','-','^','^','^','^','^','^','^','^','^','^' },
+                                    { '^','^','^','^','^','^','^','-','-','-','-','~','~','~','~','~','~','~','~','~','~','-','-','-','-','-','-','-','-','-','-' },
+                                    { '^','^','^','^','^','-','-','-','-','~','~','~','~','~','~','~','~','~','~','~','-','-','-','-','-','^','^','^','^','^','^' },
+                                    { '-','-','-','-','-','-','-','-','-','-','~','~','~','~','~','~','~','~','~','-','-','-','-','-','^','^','^','^','^','^','^' },
+                                    { '-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','~','~','~','~','-','-','-','-','^','^','^','^','^','^','^','^' },
                                     { '-','-','-','-','^','^','^','^','^','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','^','^' },
                                     { '-','-','-','^','^','^','^','^','^','^','^','^','^','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-' },
                                     { '-','-','-','^','^','^','^','^','^','^','^','^','^','-','-','-','-','-','-','-','-','~','~','~','~','~','~','~','~','~','~' },
@@ -29,8 +29,10 @@ namespace VirusSimulator_Roman
                                     { '-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-'} };
 
         static List<(int, int)> virusPosition = new List<(int, int)>();
+        static List<(int, int)> newPosition = new List<(int, int)>();
         static Random rand = new Random();
         static int virusCount = 0;
+
 
         static void Main(string[] args)
         {            
@@ -50,46 +52,24 @@ namespace VirusSimulator_Roman
                     Console.Write(landscape[i, j]);
                 }
             }
-
-            //Console.WriteLine("-------------------------------");
-            //Console.WriteLine("-------------------------------");
-            //Console.WriteLine("-------------~~~~--------------");
-            //Console.WriteLine("^^^^^^------~~~~~~~~~----------");
-            //Console.WriteLine("^^^^^^^^^--~~~~~~~~~~----------");
-            //Console.WriteLine("^^^------~~~~~~~~~~~-----^^^^^^");
-            //Console.WriteLine("----------~~~~~~~~~----^^^^^^^^");
-            //Console.WriteLine("--------------~~~~~--^^^^^^^^^^");
-            //Console.WriteLine("----^^^^^^-------------------^^");
-            //Console.WriteLine("---^^^^^^^^^^^-----------------");
-            //Console.WriteLine("---^^^^^^^^^----------~~~~~~~~~");
-            //Console.WriteLine("-^^^^^^^^^^^^^-----~~~~~~~~~~~~");
-            //Console.WriteLine("-^^^^^^^^^^^^^-----~~~~~~~~~~~~");
-            //Console.WriteLine("---------^^^-----~~~~~~~~~~~~~~");
-            //Console.WriteLine("---------------------~~~~~~~~~~");
-            //Console.WriteLine("-------------------------------");
-            //Console.WriteLine("-------------------------------");
         }
 
         static void VirusMovement()
         {
             while (true)
             {
-                
+                virusPosition.AddRange(newPosition);
 
                 while (virusCount < 3)
                 {
                     int x = rand.Next(0, 30);
-                    int y = rand.Next(0, 16);                    
-                    Console.WriteLine(x);
-                    Console.WriteLine(y);
+                    int y = rand.Next(0, 16);
 
-                    virusPosition.Add((x, y));
                     if (landscape[y, x].Equals('-'))
                     {
-                        landscape[y, x] = 'X';
+                        Console.SetCursorPosition(x, y);
+                        Console.Write('X');
                         virusPosition.Add((y, x));
-                        Console.Clear();
-                        DrawLandscape();
                         virusCount++;
                     }
                     else
@@ -98,25 +78,64 @@ namespace VirusSimulator_Roman
                     }
                 }
 
+                newPosition.Clear();
+
                 for (int i = 0; i < virusPosition.Count; i++)
                 {
                     int moveNum = rand.Next(1, 5);
-                    Thread.Sleep(1000);
-                    if (moveNum == 1 && virusPosition[i].Item1 > 0 && virusPosition[i].Item1 < 16) // down
+
+                    Thread.Sleep(1);
+
+                    (int, int) currPos = (virusPosition[i].Item1, virusPosition[i].Item2);
+
+                    if (moveNum == 1 && virusPosition[i].Item1 >= 0 && virusPosition[i].Item1 < 16) // down
                     {
-                        virusPosition[i] = (virusPosition[i].Item1 + 1, virusPosition[i].Item2);
+                        if (landscape[virusPosition[i].Item1 + 1, virusPosition[i].Item2] == '-')
+                        {
+                            Console.SetCursorPosition(virusPosition[i].Item2, virusPosition[i].Item1);
+                            Console.Write(landscape[virusPosition[i].Item1, virusPosition[i].Item2]);
+                            virusPosition[i] = (virusPosition[i].Item1 + 1, virusPosition[i].Item2);
+                            Console.SetCursorPosition(virusPosition[i].Item2, virusPosition[i].Item1);
+                            Console.Write('X');
+                            RandomSpawn(currPos);
+                        }
+
                     }
-                    else if (moveNum == 2 && virusPosition[i].Item1 > 0 && virusPosition[i].Item1 < 16) // up
+                    else if (moveNum == 2 && virusPosition[i].Item1 > 0 && virusPosition[i].Item1 <= 16) // up
                     {
-                        virusPosition[i] = (virusPosition[i].Item1 - 1, virusPosition[i].Item2);
+                        if (landscape[virusPosition[i].Item1 - 1, virusPosition[i].Item2] == '-')
+                        {
+                            Console.SetCursorPosition(virusPosition[i].Item2, virusPosition[i].Item1);
+                            Console.Write(landscape[virusPosition[i].Item1, virusPosition[i].Item2]);
+                            virusPosition[i] = (virusPosition[i].Item1 - 1, virusPosition[i].Item2);
+                            Console.SetCursorPosition(virusPosition[i].Item2, virusPosition[i].Item1);
+                            Console.Write('X');
+                            RandomSpawn(currPos);
+                        }
                     }
-                    else if (moveNum == 3 && virusPosition[i].Item2 > 0 && virusPosition[i].Item2 < 30)
+                    else if (moveNum == 3 && virusPosition[i].Item2 >= 0 && virusPosition[i].Item2 < 30) // right
                     {
-                        virusPosition[i] = (virusPosition[i].Item1, virusPosition[i].Item2 + 1);
+                        if (landscape[virusPosition[i].Item1, virusPosition[i].Item2 + 1] == '-')
+                        {
+                            Console.SetCursorPosition(virusPosition[i].Item2, virusPosition[i].Item1);
+                            Console.Write(landscape[virusPosition[i].Item1, virusPosition[i].Item2]);
+                            virusPosition[i] = (virusPosition[i].Item1, virusPosition[i].Item2 + 1);
+                            Console.SetCursorPosition(virusPosition[i].Item2, virusPosition[i].Item1);
+                            Console.Write('X');
+                            RandomSpawn(currPos);
+                        }
                     }
-                    else if (moveNum == 4 && virusPosition[i].Item2 > 0 && virusPosition[i].Item2 < 30)
+                    else if (moveNum == 4 && virusPosition[i].Item2 > 0 && virusPosition[i].Item2 <= 30) // left
                     {
-                        virusPosition[i] = (virusPosition[i].Item1, virusPosition[i].Item2 - 1);
+                        if (landscape[virusPosition[i].Item1, virusPosition[i].Item2 - 1] == '-')
+                        {
+                            Console.SetCursorPosition(virusPosition[i].Item2, virusPosition[i].Item1);
+                            Console.Write(landscape[virusPosition[i].Item1, virusPosition[i].Item2]);
+                            virusPosition[i] = (virusPosition[i].Item1, virusPosition[i].Item2 - 1);
+                            Console.SetCursorPosition(virusPosition[i].Item2, virusPosition[i].Item1);
+                            Console.Write('X');
+                            RandomSpawn(currPos);
+                        }
                     }
                 }
              
@@ -124,9 +143,29 @@ namespace VirusSimulator_Roman
 
         }
 
-        static void Move()
+        static void RandomSpawn((int, int) currPosition)
         {
-            
+            int required = 9;
+            int randInt = rand.Next(0, 11);
+
+            if (randInt > required)
+            {
+                if (landscape[currPosition.Item1, currPosition.Item2].Equals('-'))
+                {
+                    Console.SetCursorPosition(currPosition.Item2, currPosition.Item1);
+                    Console.Write('X');
+                    newPosition.Add((currPosition.Item1, currPosition.Item2));
+                    virusCount++;
+                }
+                else
+                {
+                    return;
+                }
+            }
+            else
+            {
+                return;
+            }
         }
 
 
